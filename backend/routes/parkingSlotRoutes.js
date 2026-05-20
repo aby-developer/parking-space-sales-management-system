@@ -1,9 +1,19 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const parkingController = require('../controllers/parkingSlotController.js');
+const {
+    createSlot,
+    getAllSlots,
+    deleteSlot
+} = require("../controllers/parkingSlotController");
 
-router.post('/add', parkingController.createSlot);
-router.get('/all', parkingController.getAllSlots);
+// CREATE
+router.post("/add", createSlot);
+
+// GET ALL
+router.get("/all", getAllSlots);
+
+// DELETE
+router.delete("/:id", deleteSlot);
 
 module.exports = router;

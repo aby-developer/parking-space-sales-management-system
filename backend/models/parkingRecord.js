@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const parkingRecordSchema = new mongoose.Schema({
+
     carId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Car',
@@ -19,8 +20,7 @@ const parkingRecordSchema = new mongoose.Schema({
     },
 
     exitTime: {
-        type: Date,
-        default: null
+        type: Date
     },
 
     duration: {
@@ -30,11 +30,17 @@ const parkingRecordSchema = new mongoose.Schema({
 
     status: {
         type: String,
-        enum: ['active', 'completed'],
-        default: 'active'
+        enum: ["active", "completed"],
+        default: "active"
     },
 
     isPaid: {
+        type: Boolean,
+        default: false
+    },
+
+    // ✅ SOFT DELETE FLAG
+    isDeleted: {
         type: Boolean,
         default: false
     }

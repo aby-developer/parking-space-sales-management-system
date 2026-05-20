@@ -1,19 +1,27 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
 const {
     createCar,
     getAllCars,
-    getCarById
-} = require('../controllers/carController');
+    getCarById,
+    updateCar,
+    deleteCar
+} = require("../controllers/carController");
 
 // CREATE
-router.post('/add', createCar);
+router.post("/add", createCar);
 
 // READ ALL
-router.get('/all', getAllCars);
+router.get("/all", getAllCars);
 
 // READ ONE
-router.get('/all/:id', getCarById);
+router.get("/:id", getCarById);
+
+// UPDATE
+router.put("/:id", updateCar);
+
+// DELETE
+router.delete("/:id", deleteCar);
 
 module.exports = router;

@@ -5,6 +5,7 @@ const ParkingRecord = require('../models/parkingRecord');
 // ================= GET PENDING PAYMENTS =================
 const getPendingPayments = async (req, res) => {
     try {
+
         const records = await ParkingRecord.find({
             status: "completed",
             isPaid: false
@@ -16,7 +17,11 @@ const getPendingPayments = async (req, res) => {
         });
 
     } catch (err) {
-        res.status(500).json({ message: err.message });
+
+        res.status(500).json({
+            message: err.message
+        });
+
     }
 };
 
@@ -24,35 +29,78 @@ const getPendingPayments = async (req, res) => {
 // ================= CREATE PAYMENT =================
 const createPayment = async (req, res) => {
     try {
-        const record = await ParkingRecord.findById(req.body.recordId)
-            .populate('carId slotId');
 
+        // validate input
+        if (!req.body.recordId) {
+            return res.status(400).json({
+                message: "Record ID is required"
+            });
+        }
+
+        // find parking record
+        const record = await ParkingRecord.findById(
+            req.body.recordId
+        ).populate('carId slotId');
+
+        // check if record exists
         if (!record) {
-            return res.status(404).json({ message: "Record not found" });
+            return res.status(404).json({
+                message: "Record not found"
+            });
         }
 
-        if (record.isPaid) {
-            return res.status(400).json({ message: "Already paid" });
-        }
-
-        // IMPORTANT: use stored duration from ParkingRecord
-        const amount = record.duration * 500;
-
-        const payment = await Payment.create({
-            recordId: record._id,
-            amount
+        // prevent duplicate payment
+        const existingPayment = await Payment.findOne({
+            recordId: record._id
         });
 
+        if (existingPayment) {
+            return res.status(400).json({
+                message: "Payment already exists"
+            });
+        }
+
+        // check already paid
+        if (record.isPaid) {
+            return res.status(400).json({
+                message: "Already paid"
+            });
+        }
+
+        // calculate amount
+        const amount = record.duration * 500;
+
+        // create payment + bill
+        const payment = await Payment.create({
+            recordId: record._id,
+            amount,
+
+            // BILL INFO
+            billNumber: "BILL-" + Date.now(),
+
+            isHidden: false,
+
+            companyName: "PSSMS Parking",
+
+            generatedBy: "Manager"
+        });
+
+        // mark record paid
         record.isPaid = true;
+
         await record.save();
 
         res.status(201).json({
-            message: "Payment created successfully",
+            message: "Payment completed successfully",
             payment
         });
 
     } catch (err) {
-        res.status(500).json({ message: err.message });
+
+        res.status(500).json({
+            message: err.message
+        });
+
     }
 };
 
@@ -60,6 +108,7 @@ const createPayment = async (req, res) => {
 // ================= GET ALL PAYMENTS =================
 const getAllPayments = async (req, res) => {
     try {
+
         const payments = await Payment.find()
             .populate({
                 path: 'recordId',
@@ -75,7 +124,11 @@ const getAllPayments = async (req, res) => {
         });
 
     } catch (err) {
-        res.status(500).json({ message: err.message });
+
+        res.status(500).json({
+            message: err.message
+        });
+
     }
 };
 
@@ -83,6 +136,7 @@ const getAllPayments = async (req, res) => {
 // ================= GET PAYMENT BY ID =================
 const getPaymentById = async (req, res) => {
     try {
+
         const payment = await Payment.findById(req.params.id)
             .populate({
                 path: 'recordId',
@@ -93,13 +147,19 @@ const getPaymentById = async (req, res) => {
             });
 
         if (!payment) {
-            return res.status(404).json({ message: "Payment not found" });
+            return res.status(404).json({
+                message: "Payment not found"
+            });
         }
 
         res.status(200).json(payment);
 
     } catch (err) {
-        res.status(500).json({ message: err.message });
+
+        res.status(500).json({
+            message: err.message
+        });
+
     }
 };
 
@@ -107,24 +167,64 @@ const getPaymentById = async (req, res) => {
 // ================= UPDATE PAYMENT =================
 const updatePayment = async (req, res) => {
     try {
+
         const payment = await Payment.findById(req.params.id);
 
         if (!payment) {
-            return res.status(404).json({ message: "Payment not found" });
+            return res.status(404).json({
+                message: "Payment not found"
+            });
         }
 
         payment.amount = req.body.amount || payment.amount;
-        payment.paymentDate = req.body.paymentDate || payment.paymentDate;
 
-        const updated = await payment.save();
+        payment.paymentDate =
+            req.body.paymentDate || payment.paymentDate;
+
+        await payment.save();
 
         res.status(200).json({
             message: "Payment updated",
-            updated
+            payment
         });
 
     } catch (err) {
-        res.status(500).json({ message: err.message });
+
+        res.status(500).json({
+            message: err.message
+        });
+
+    }
+};
+
+
+// ================= HIDE / SHOW BILL =================
+const togglePaymentVisibility = async (req, res) => {
+    try {
+
+        const payment = await Payment.findById(req.params.id);
+
+        if (!payment) {
+            return res.status(404).json({
+                message: "Payment not found"
+            });
+        }
+
+        payment.isHidden = !payment.isHidden;
+
+        await payment.save();
+
+        res.status(200).json({
+            message: "Bill visibility updated",
+            payment
+        });
+
+    } catch (err) {
+
+        res.status(500).json({
+            message: err.message
+        });
+
     }
 };
 
@@ -132,10 +232,13 @@ const updatePayment = async (req, res) => {
 // ================= DELETE PAYMENT =================
 const deletePayment = async (req, res) => {
     try {
+
         const payment = await Payment.findById(req.params.id);
 
         if (!payment) {
-            return res.status(404).json({ message: "Payment not found" });
+            return res.status(404).json({
+                message: "Payment not found"
+            });
         }
 
         await payment.deleteOne();
@@ -145,7 +248,11 @@ const deletePayment = async (req, res) => {
         });
 
     } catch (err) {
-        res.status(500).json({ message: err.message });
+
+        res.status(500).json({
+            message: err.message
+        });
+
     }
 };
 
@@ -157,5 +264,6 @@ module.exports = {
     getAllPayments,
     getPaymentById,
     updatePayment,
+    togglePaymentVisibility,
     deletePayment
 };

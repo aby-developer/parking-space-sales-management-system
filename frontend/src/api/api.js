@@ -21,41 +21,62 @@ export const login = async (data) => {
 
 // ================= CAR =================
 export const createCar = async (data) => {
-    try {
-        const res = await Api.post("/car/add", data);
-        return res.data;
-    } catch (error) {
-        throw error.response?.data || error.message;
-    }
+    const res = await Api.post("/car/add", data);
+    return res.data;
 };
 
 export const getCars = async () => {
+    const res = await Api.get("/car/all");
+    return res.data;
+};
+
+export const getCarById = async (id) => {
+    const res = await Api.get(`/car/${id}`);
+    return res.data;
+};
+
+export const deleteCar = async (id) => {
+    const res = await Api.delete(`/car/${id}`);
+    return res.data;
+};
+
+export const updateCar = async (id, data) => {
     try {
-        const res = await Api.get("/car/all");
+        const res = await Api.put(`/car/${id}`, data);
         return res.data;
     } catch (error) {
         throw error.response?.data || error.message;
     }
 };
 
-
-// ================= SLOT =================
 export const createSlot = async (data) => {
-    try {
-        const res = await Api.post("/slot/add", data);
-        return res.data;
-    } catch (error) {
-        throw error.response?.data || error.message;
-    }
+    const res = await Api.post("/slot/add", data);
+    return res.data;
 };
 
 export const getSlots = async () => {
-    try {
-        const res = await Api.get("/slot/all");
-        return res.data;
-    } catch (error) {
-        throw error.response?.data || error.message;
-    }
+    const res = await Api.get("/slot/all");
+    return res.data;
+};
+
+export const deleteSlot = async (id) => {
+    const res = await Api.delete(`/slot/${id}`);
+    return res.data;
+};
+
+export const generateReport = async (date) => {
+    const res = await Api.post("/report/generate", { date });
+    return res.data;
+};
+
+export const getAllReports = async () => {
+    const res = await Api.get("/report/all");
+    return res.data;
+};
+
+export const deleteReport = async (id) => {
+    const res = await Api.delete(`/report/${id}`);
+    return res.data;
 };
 
 
@@ -162,5 +183,22 @@ export const getPendingPayments = async () => {
         return res.data;
     } catch (error) {
         throw error.response?.data || error.message;
+    }
+};
+
+// ================= TOGGLE PAYMENT VISIBILITY =================
+export const togglePaymentVisibility = async (id) => {
+    try {
+
+        const res = await Api.put(
+            `/payment/payments/toggle/${id}`
+        );
+
+        return res.data;
+
+    } catch (error) {
+
+        throw error.response?.data || error.message;
+
     }
 };

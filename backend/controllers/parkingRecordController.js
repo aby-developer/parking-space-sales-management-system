@@ -1,14 +1,13 @@
 const ParkingRecord = require('../models/parkingRecord');
 const ParkingSlot = require('../models/parkingSlot');
-const Payment = require('../models/payment');
 
 
 // ================= ENTRY =================
 const createRecord = async (req, res) => {
     try {
+
         const { carId, slotId } = req.body;
 
-        // check slot availability
         const slot = await ParkingSlot.findById(slotId);
 
         if (!slot) {
@@ -24,7 +23,6 @@ const createRecord = async (req, res) => {
             slotId
         });
 
-        // UPDATE SLOT → OCCUPIED
         slot.status = "Occupied";
         await slot.save();
 
@@ -39,12 +37,15 @@ const createRecord = async (req, res) => {
 };
 
 
-// ================= GET ALL =================
+// ================= GET ALL (HIDE DELETED) =================
 const getAllRecords = async (req, res) => {
     try {
-        const records = await ParkingRecord.find()
-            .populate('carId')
-            .populate('slotId');
+
+        const records = await ParkingRecord.find({
+            isDeleted: false
+        })
+        .populate('carId')
+        .populate('slotId');
 
         res.status(200).json({
             count: records.length,
@@ -60,9 +61,13 @@ const getAllRecords = async (req, res) => {
 // ================= GET BY ID =================
 const getRecordById = async (req, res) => {
     try {
-        const record = await ParkingRecord.findById(req.params.id)
-            .populate('carId')
-            .populate('slotId');
+
+        const record = await ParkingRecord.findOne({
+            _id: req.params.id,
+            isDeleted: false
+        })
+        .populate('carId')
+        .populate('slotId');
 
         if (!record) {
             return res.status(404).json({ message: "Record not found" });
@@ -79,14 +84,16 @@ const getRecordById = async (req, res) => {
 // ================= UPDATE =================
 const updateRecord = async (req, res) => {
     try {
+
         const record = await ParkingRecord.findById(req.params.id);
 
-        if (!record) {
+        if (!record || record.isDeleted) {
             return res.status(404).json({ message: "Record not found" });
         }
 
-        // only allow safe updates (optional improvement)
-        if (req.body.exitTime) record.exitTime = req.body.exitTime;
+        if (req.body.exitTime) {
+            record.exitTime = req.body.exitTime;
+        }
 
         await record.save();
 
@@ -101,24 +108,36 @@ const updateRecord = async (req, res) => {
 };
 
 
-// ================= DELETE =================
+// ================= SOFT DELETE =================
 const deleteRecord = async (req, res) => {
     try {
+
         const record = await ParkingRecord.findById(req.params.id);
 
-        if (!record) {
+        if (!record || record.isDeleted) {
             return res.status(404).json({ message: "Record not found" });
         }
 
-        // FREE SLOT FIRST
-        await ParkingSlot.findByIdAndUpdate(record.slotId, {
-            status: "Available"
-        });
+        // ❌ prevent deleting paid records
+        if (record.isPaid) {
+            return res.status(400).json({
+                message: "Cannot delete a paid record"
+            });
+        }
 
-        await record.deleteOne();
+        // ✅ soft delete
+        record.isDeleted = true;
+        await record.save();
+
+        // free slot only if active
+        if (record.status === "active") {
+            await ParkingSlot.findByIdAndUpdate(record.slotId, {
+                status: "Available"
+            });
+        }
 
         res.status(200).json({
-            message: "Record deleted and slot freed"
+            message: "Record archived successfully"
         });
 
     } catch (err) {
@@ -127,24 +146,23 @@ const deleteRecord = async (req, res) => {
 };
 
 
-
-// ================= EXIT (IMPORTANT BUSINESS LOGIC) =================
-// ⚠ NOT IN ROUTES YET — ADD IT IF YOU WANT FRONTEND EXIT BUTTON
+// ================= EXIT =================
 const markExit = async (req, res) => {
     try {
+
         const record = await ParkingRecord.findById(req.params.id);
 
-        if (!record) {
+        if (!record || record.isDeleted) {
             return res.status(404).json({ message: "Not found" });
         }
 
         const exitTime = new Date();
         record.exitTime = exitTime;
 
-        // duration
         let hours = Math.ceil(
             (exitTime - record.entryTime) / (1000 * 60 * 60)
         );
+
         if (hours < 1) hours = 1;
 
         record.duration = hours;
@@ -152,7 +170,6 @@ const markExit = async (req, res) => {
 
         await record.save();
 
-        // free slot
         await ParkingSlot.findByIdAndUpdate(record.slotId, {
             status: "Available"
         });

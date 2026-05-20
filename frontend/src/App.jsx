@@ -1,26 +1,41 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Cars from './pages/Car';
-import Slots from './pages/Slot';
-import Records from './pages/ParkingRecord';
-import Payment from './pages/Payment';
+import MainLayout from "./layout/MainLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+import Dashboard from "./pages/Dashboard";
+import Cars from "./pages/Car";
+import Slots from "./pages/Slot";
+import Parking from "./pages/ParkingRecord";
+import Payments from "./pages/Payment";
+import DailyReport from "./pages/DailyReport";
+import Login from "./pages/Login";
 
 export default function App() {
+    return (
+        <BrowserRouter>
+            <Routes>
 
-  return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/car" element={<Cars />} />
-          <Route path="/slot" element={<Slots />} />
-          <Route path="/records" element={<Records />} />
-          <Route path="/payment" element={<Payment />} />
-        </Routes>
-      </BrowserRouter>
-    </>
-  )
+                {/* PUBLIC */}
+                <Route path="/login" element={<Login />} />
+
+                {/* PROTECTED ROUTES */}
+                <Route
+                    element={
+                        <ProtectedRoute>
+                            <MainLayout />
+                        </ProtectedRoute>
+                    }
+                >
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/cars" element={<Cars />} />
+                    <Route path="/slots" element={<Slots />} />
+                    <Route path="/parking" element={<Parking />} />
+                    <Route path="/payments" element={<Payments />} />
+                    <Route path="/reports" element={<DailyReport />} />
+                </Route>
+
+            </Routes>
+        </BrowserRouter>
+    );
 }

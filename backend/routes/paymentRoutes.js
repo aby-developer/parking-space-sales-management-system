@@ -21,4 +21,7 @@ router.put('/payments/:id', paymentController.updatePayment);
 // ================= DELETE PAYMENT =================
 router.delete('/payments/:id', paymentController.deletePayment);
 
+// ================= TOGGLE VISIBILITY =================
+router.put('/payments/toggle/:id', paymentController.togglePaymentVisibility);
+
 module.exports = router;

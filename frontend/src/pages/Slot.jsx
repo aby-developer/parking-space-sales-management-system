@@ -43,7 +43,7 @@ export default function Slots() {
     const showNotification = (message, type) => {
         const notification = document.createElement('div');
         notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-xl shadow-2xl animate-slide-in flex items-center gap-2 ${
-            type === 'success' ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 'bg-gradient-to-r from-red-500 to-pink-600'
+            type === 'success' ? 'bg-gradient-to-r from-[#16A34A] to-[#15803D]' : 'bg-gradient-to-r from-red-500 to-red-600'
         } text-white`;
         notification.innerHTML = `
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -64,8 +64,8 @@ export default function Slots() {
 
     const getStatusColor = (status) => {
         return status === "Available" 
-            ? "from-green-500 to-emerald-600" 
-            : "from-red-500 to-pink-600";
+            ? "from-[#16A34A] to-[#15803D]" 
+            : "from-red-500 to-red-600";
     };
 
     const getStatusIcon = (status) => {
@@ -77,16 +77,16 @@ export default function Slots() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-[#16A34A] to-[#15803D] bg-clip-text text-transparent">
                         Parking Slots
                     </h1>
-                    <p className="text-gray-500 mt-1">Manage parking slots and their availability</p>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1">Manage parking slots and their availability</p>
                 </div>
                 <div className="flex gap-3">
                     <select
                         value={filter}
                         onChange={(e) => setFilter(e.target.value)}
-                        className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+                        className="px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#16A34A]/40 focus:border-[#16A34A] bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-all"
                     >
                         <option value="all">All Slots</option>
                         <option value="available">Available</option>
@@ -96,15 +96,15 @@ export default function Slots() {
             </div>
 
             {/* Add Slot Form */}
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 shadow-lg">
+            <div className="bg-gradient-to-br from-[#16A34A]/5 to-[#15803D]/5 dark:from-[#16A34A]/10 dark:to-[#15803D]/10 rounded-2xl p-6 shadow-md">
                 <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4">
                     <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Slot Number</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Slot Number</label>
                         <input
                             placeholder="e.g., A1, B2, C3"
                             value={slotNumber}
                             onChange={(e) => setSlotNumber(e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all duration-300"
+                            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#16A34A]/40 focus:border-[#16A34A] transition-all duration-300"
                             required
                         />
                     </div>
@@ -112,7 +112,7 @@ export default function Slots() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
+                            className="bg-gradient-to-r from-[#16A34A] to-[#15803D] text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -126,14 +126,14 @@ export default function Slots() {
             {/* Slots Grid */}
             {loading ? (
                 <div className="flex justify-center items-center h-64">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#16A34A]"></div>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {filteredSlots.map((slot, index) => (
                         <div
                             key={slot._id}
-                            className={`bg-gradient-to-br ${getStatusColor(slot.status)} rounded-2xl shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300 animate-fade-in-up`}
+                            className={`bg-gradient-to-br ${getStatusColor(slot.status)} rounded-2xl shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300 animate-fade-in-up cursor-pointer group`}
                             style={{ animationDelay: `${index * 0.05}s` }}
                         >
                             <div className="p-6 text-white">
@@ -141,7 +141,7 @@ export default function Slots() {
                                     <div className="text-4xl">🅿️</div>
                                     <button
                                         onClick={() => handleDelete(slot._id)}
-                                        className="bg-white/20 hover:bg-red-500/50 p-2 rounded-lg transition-all duration-300"
+                                        className="bg-white/20 hover:bg-red-500/50 p-2 rounded-lg transition-all duration-300 opacity-0 group-hover:opacity-100"
                                     >
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -161,11 +161,12 @@ export default function Slots() {
                 </div>
             )}
 
+            {/* Empty State */}
             {filteredSlots.length === 0 && !loading && (
-                <div className="text-center py-12 bg-gray-50 rounded-2xl">
+                <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-2xl">
                     <div className="text-6xl mb-4">🅿️</div>
-                    <p className="text-gray-500 text-lg">No parking slots found</p>
-                    <p className="text-gray-400">Add your first slot using the form above</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-lg">No parking slots found</p>
+                    <p className="text-gray-400 dark:text-gray-500">Add your first slot using the form above</p>
                 </div>
             )}
         </div>

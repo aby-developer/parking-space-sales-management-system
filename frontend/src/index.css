@@ -1,143 +1,233 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
-/* Custom animations */
+/* Rest of your CSS... */
+/* Custom Theme Variables */
+:root {
+  --primary: #16A34A;
+  --secondary: #15803D;
+  --accent: #3B82F6;
+  --background-light: #F1F5F9;
+  --background-dark: #0F172A;
+}
+
+/* Dark mode variables */
+.dark {
+  --primary: #22C55E;
+  --secondary: #16A34A;
+  --accent: #60A5FA;
+}
+
+/* Custom Animations */
 @keyframes fade-in-up {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes bounce-in {
-    0% {
-        opacity: 0;
-        transform: scale(0.3);
-    }
-    50% {
-        opacity: 1;
-        transform: scale(1.05);
-    }
-    70% {
-        transform: scale(0.9);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-
-@keyframes blob {
-    0% {
-        transform: translate(0px, 0px) scale(1);
-    }
-    33% {
-        transform: translate(30px, -50px) scale(1.1);
-    }
-    66% {
-        transform: translate(-20px, 20px) scale(0.9);
-    }
-    100% {
-        transform: translate(0px, 0px) scale(1);
-    }
-}
-
-@keyframes float {
-    0% {
-        transform: translateY(0px) translateX(0px);
-        opacity: 0;
-    }
-    50% {
-        transform: translateY(-100px) translateX(50px);
-        opacity: 0.5;
-    }
-    100% {
-        transform: translateY(-200px) translateX(100px);
-        opacity: 0;
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slide-in {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
-    20%, 40%, 60%, 80% { transform: translateX(2px); }
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
-@keyframes pulse-ring {
-    0% {
-        transform: scale(0.8);
-        opacity: 0.5;
-    }
-    100% {
-        transform: scale(1.3);
-        opacity: 0;
-    }
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
-@keyframes shimmer {
-    0% {
-        background-position: -1000px 0;
-    }
-    100% {
-        background-position: 1000px 0;
-    }
-}
-
+/* Utility Classes */
 .animate-fade-in-up {
-    animation: fade-in-up 0.6s ease-out;
-}
-
-.animate-bounce-in {
-    animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-.animate-blob {
-    animation: blob 7s infinite;
-}
-
-.animate-float {
-    animation: float linear infinite;
+  animation: fade-in-up 0.5s ease-out forwards;
 }
 
 .animate-slide-in {
-    animation: slide-in 0.3s ease-out;
+  animation: slide-in 0.3s ease-out forwards;
 }
 
-.animate-shake {
-    animation: shake 0.5s ease-in-out;
+.animate-bounce-in {
+  animation: bounce-in 0.6s ease-out forwards;
 }
 
-.animation-delay-2000 {
-    animation-delay: 2s;
+.animate-pulse-slow {
+  animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-.animation-delay-4000 {
-    animation-delay: 4s;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-/* Custom utility classes */
-@layer utilities {
-    .backdrop-blur-custom {
-        backdrop-filter: blur(12px);
-    }
-    
-    .text-gradient {
-        background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-    }
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #16A34A;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #15803D;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1F2937;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #22C55E;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, transform, box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 2px solid #16A34A;
+  outline-offset: 2px;
+}
+
+/* Dark mode focus */
+.dark *:focus-visible {
+  outline-color: #22C55E;
+}
+
+/* Loading spinner */
+.spinner {
+  border: 3px solid rgba(22, 163, 74, 0.1);
+  border-radius: 50%;
+  border-top: 3px solid #16A34A;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+.dark .spinner {
+  border-top-color: #22C55E;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+}
+
+/* react-phone-input-2 custom styling for Tailwind */
+.phone-input-container {
+  width: 100%;
+}
+
+.react-tel-input .form-control {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0.625rem 1rem 0.625rem 3.5rem !important;
+  font-size: 0.875rem !important;
+  font-family: inherit !important;
+}
+
+.dark .react-tel-input .form-control {
+  background-color: #1f2937 !important;
+  border-color: #4b5563 !important;
+  color: #f9fafb !important;
+}
+
+.dark .react-tel-input .form-control:focus {
+  border-color: #16a34a !important;
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2) !important;
+}
+
+.react-tel-input .flag-dropdown {
+  background-color: #f9fafb !important;
+  border-radius: 0.75rem 0 0 0.75rem !important;
+  border-color: #e5e7eb !important;
+}
+
+.dark .react-tel-input .flag-dropdown {
+  background-color: #1f2937 !important;
+  border-color: #4b5563 !important;
+}
+
+.dark .react-tel-input .selected-flag {
+  background-color: #1f2937 !important;
+}
+
+.dark .react-tel-input .selected-flag:hover {
+  background-color: #374151 !important;
+}
+
+.react-tel-input .country-list {
+  border-radius: 0.75rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.dark .react-tel-input .country-list {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+}
+
+.dark .react-tel-input .country-list .country:hover {
+  background-color: #374151 !important;
+}
+
+.dark .react-tel-input .country-list .country.highlight {
+  background-color: #374151 !important;
+}
+
+.react-tel-input .search-box {
+  border-radius: 0.5rem !important;
+  margin: 0.5rem !important;
+  width: calc(100% - 1rem) !important;
+}
+
+.dark .react-tel-input .search-box {
+  background-color: #1f2937 !important;
+  border-color: #4b5563 !important;
+  color: #f9fafb !important;
 }

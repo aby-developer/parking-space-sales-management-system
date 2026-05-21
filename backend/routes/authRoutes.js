@@ -11,4 +11,6 @@ router.post('/login', authController.loginUser);
 
 router.post("/forgot-password", authController.forgotPassword);
 
+router.post("/google", authController.googleLogin);
+
 module.exports = router;

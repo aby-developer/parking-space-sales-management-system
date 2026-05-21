@@ -1,6 +1,53 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require("google-auth-library");
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+
+const googleLogin = async (req, res) => {
+    try {
+        const { token } = req.body;
+
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+
+        const { sub, email, name, picture } = payload;
+
+        // check if user exists
+        let user = await User.findOne({ username: email });
+
+        // if not exist → create
+        if (!user) {
+            user = await User.create({
+                username: email,
+                password: "", // no password for google users
+                cityOfBirth: "google",
+                childhoodNickname: "google",
+            });
+        }
+
+        const jwtToken = jwt.sign(
+            { id: user._id, username: user.username },
+            process.env.JWT_SECRET,
+            { expiresIn: "1d" }
+        );
+
+        res.json({
+            message: "Google login successful",
+            token: jwtToken,
+            user,
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
 
 const registerUser = async (req, res) => {
@@ -114,5 +161,6 @@ const forgotPassword = async (req, res) => {
 module.exports = {
     registerUser,
     loginUser,
-    forgotPassword
+    forgotPassword,
+    googleLogin
 };

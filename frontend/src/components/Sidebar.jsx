@@ -83,7 +83,12 @@ export default function Sidebar() {
         localStorage.setItem("sidebarCollapsed", newState);
     };
 
+    const closeSidebar = () => {
+        setOpen(false);
+    };
+
     useEffect(() => {
+        // Auto-close sidebar on mobile when route changes
         setOpen(false);
     }, [location.pathname]);
 
@@ -92,9 +97,9 @@ export default function Sidebar() {
 
     return (
         <>
-            {/* MOBILE BUTTON */}
+            {/* MOBILE BUTTON - Opens sidebar */}
             <button
-                onClick={() => setOpen(!open)}
+                onClick={() => setOpen(true)}
                 className="
                     lg:hidden fixed top-4 left-4 z-50
                     bg-gradient-to-r from-[#16A34A] to-[#15803D]
@@ -107,18 +112,18 @@ export default function Sidebar() {
                 </svg>
             </button>
 
-            {/* OVERLAY */}
+            {/* OVERLAY - Blurs and hides main content when sidebar is open */}
             {open && (
                 <div
-                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 lg:hidden transition-all duration-300"
-                    onClick={() => setOpen(false)}
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-all duration-300"
+                    onClick={closeSidebar}
                 />
             )}
 
             {/* SIDEBAR */}
             <aside
                 className={`
-                    fixed top-0 left-0 z-40
+                    fixed top-0 left-0 z-50
                     h-screen
                     ${sidebarWidth}
                     transition-all duration-300 ease-in-out
@@ -129,10 +134,31 @@ export default function Sidebar() {
 
                     ${open
                         ? "translate-x-0"
-                        : "-translate-x-full lg:translate-x-0"
+                        : "-translate-x-full"
                     }
+                    
+                    lg:translate-x-0
+                    ${collapsed ? "lg:w-20" : "lg:w-64"}
                 `}
             >
+                {/* CLOSE BUTTON - Mobile only */}
+                <button
+                    onClick={closeSidebar}
+                    className="
+                        absolute top-4 right-4
+                        lg:hidden
+                        p-2 rounded-lg
+                        bg-gray-100 dark:bg-gray-800
+                        text-gray-600 dark:text-gray-400
+                        hover:bg-gray-200 dark:hover:bg-gray-700
+                        transition-all duration-200
+                    "
+                >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+
                 {/* COLLAPSE BUTTON - Desktop only */}
                 <button
                     onClick={toggleCollapse}
@@ -197,6 +223,7 @@ export default function Sidebar() {
                             <Link
                                 key={item.path}
                                 to={item.path}
+                                onClick={closeSidebar}
                                 onMouseEnter={() => setHoveredItem(item.path)}
                                 onMouseLeave={() => setHoveredItem(null)}
                                 className={`
@@ -263,7 +290,7 @@ export default function Sidebar() {
                     </nav>
                 </div>
 
-                {/* THEME TOGGLE IN SIDEBAR - FIXED VERSION */}
+                {/* THEME TOGGLE IN SIDEBAR */}
                 <div className={`px-4 pb-4 ${collapsed ? "flex justify-center" : ""}`}>
                     {collapsed ? (
                         <button
